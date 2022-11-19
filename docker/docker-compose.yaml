@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  server:
+    build:
+      context: ./../
+      dockerfile: ./docker/server/Dockerfile
+    tty: true
+    working_dir: /app
+    volumes:
+      - ./../server:/app:z
+    ports:
+      - 9090:9090
+    networks:
+      - eks_demo_net
+
+networks:
+  eks_demo_net:
+    driver: bridge
