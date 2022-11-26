@@ -39,10 +39,10 @@ jobs:
 
       - name: Add tag
         run: |
-          docker tag $REPOSITORY_NAME:latest ${{ secrets.EKS_REPOSITORY }}/$REPOSITORY_NAME:latest
-          docker tag $REPOSITORY_NAME:latest ${{ secrets.EKS_REPOSITORY }}/$REPOSITORY_NAME:${{ github.sha }}
+          docker tag $REPOSITORY_NAME:latest ${{ secrets.ECR_REPOSITORY }}/$REPOSITORY_NAME:latest
+          docker tag $REPOSITORY_NAME:latest ${{ secrets.ECR_REPOSITORY }}/$REPOSITORY_NAME:${{ github.sha }}
 
       - name: Push image
         run: |
-          docker push ${{ secrets.EKS_REPOSITORY }}/eks_demo:latest
-          docker push ${{ secrets.EKS_REPOSITORY }}/eks_demo:${{ github.sha }}
+          docker push ${{ secrets.ECR_REPOSITORY }}/eks_demo:latest
+          docker push ${{ secrets.ECR_REPOSITORY }}/eks_demo:${{ github.sha }}
