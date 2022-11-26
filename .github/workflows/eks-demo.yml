@@ -13,9 +13,36 @@ jobs:
     if: ${{inputs.command == 'deploy'}}
     runs-on: ubuntu-latest
 
+    env:
+      REPOSITORY_NAME: eks_demo
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: echo
-        run: echo "run workflow"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      
+      - name: Build server image
+        run: >
+          docker build
+          -t $REPOSITORY_NAME .
+          -f ./docker/server/Dockerfile
+
+      - name: Add tag
+        run: |
+          docker tag $REPOSITORY_NAME:latest ${{ secrets.EKS_REPOSITORY }}/$REPOSITORY_NAME:latest
+          docker tag $REPOSITORY_NAME:latest ${{ secrets.EKS_REPOSITORY }}/$REPOSITORY_NAME:${{ github.sha }}
+
+      - name: Push image
+        run: |
+          docker push ${{ secrets.EKS_REPOSITORY }}/eks_demo:latest
+          docker push ${{ secrets.EKS_REPOSITORY }}/eks_demo:${{ github.sha }}
